@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 	test.setTexture(texture);
 
 	Game game(1280, 720, "Pkmn Engine");
-	//game.load(test);
+	game.load(test);
 	game.run();
 
 	return 0;

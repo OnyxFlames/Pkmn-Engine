@@ -3,7 +3,7 @@
 #include <iostream> // For debugging. The base engine will not print to console in the end.
 
 Game::Game(uint32_t width, uint32_t height, std::string title)
-	: _window(sf::VideoMode(width, height), title)
+	: _window(sf::VideoMode(width, height), title), renderThread(&render, this)
 {
 	view.setCenter((float)width / 2, (float)height / 2);
 	view.setSize(sf::Vector2f((float)width, (float)height));
@@ -26,6 +26,9 @@ Game::Game(uint32_t width, uint32_t height, std::string title)
 	map.reserve_memory();
 	map.load();
 	maps.push_back(std::make_unique<Tilemap>(map));
+
+	_window.setActive(false);
+	renderThread.launch();
 }
 
 
@@ -77,7 +80,6 @@ void Game::run()
 			delta = sf::microseconds(0);
 		handleInput();
 		update(delta);
-		render();
 	}
 }
 void Game::handleInput()
@@ -132,20 +134,26 @@ void Game::update(sf::Time delta)
 	if (m_left)
 		sprites[0]->move(-(player_speed * delta.asMicroseconds()), 0.0f);
 }
-void Game::render()
+void render(Game *game)
 {
 	/*
 	TODO: Get sf::View working so the window doesnt default and has a proper view window.
-	*/
 
-	_window.clear();
-	for (std::unique_ptr<sf::Sprite> &draw : sprites)
-		_window.draw(*draw);
-	for (std::unique_ptr<sf::Text> &draw : texts)
-		_window.draw(*draw);
-	for (std::unique_ptr<Tilemap> &draw : maps)
-		;//_window.draw(draw->draw());
-	_window.display();
+	TODO2: Implement a swap for resource vectors so that when a new scene needs to be loaded, the engine will populate a vector with the new resources, then at the time of loading, swap them,
+	then clean out the old vector if necessary.
+	*/
+	while (game->get_window().isOpen())
+	{
+		game->get_window().clear();
+		for (std::unique_ptr<sf::Sprite> &draw : game->get_sprites())
+			game->get_window().draw(*draw);
+		for (std::unique_ptr<sf::Text> &draw : game->get_texts())
+			game->get_window().draw(*draw);
+		for (std::unique_ptr<Tilemap> &draw : game->get_maps())
+			;/*if (draw != nullptr)
+				game->_window.draw(*draw);*/	// TODO: flesh out tilemaps
+		game->get_window().display();
+	}
 }
 
 void Game::load(sf::Sprite &sprite)

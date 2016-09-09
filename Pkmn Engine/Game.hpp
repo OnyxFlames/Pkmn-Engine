@@ -39,10 +39,10 @@ public:
 	std::vector<std::unique_ptr<sf::Text>>& get_texts() { return texts; }
 	std::vector <std::unique_ptr<Tilemap>>& get_maps() { return maps; }
 
-
 	void run();
 	void update(sf::Time delta);
 	void handleInput();
+	void builtin_render();
 	void load(sf::Sprite &sprite);
 	
 	~Game();

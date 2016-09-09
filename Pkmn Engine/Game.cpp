@@ -156,6 +156,23 @@ void render(Game *game)
 	}
 }
 
+void Game::builtin_render()
+{
+	/*
+		If, for some reason the host computer doesn't support multithreaded rendering, the game will fall back onto this function as part of it's run loop.
+	*/
+
+	_window.clear();
+	for (std::unique_ptr<sf::Sprite> &draw : sprites)
+		_window.draw(*draw);
+	for (std::unique_ptr<sf::Text> &draw : texts)
+		_window.draw(*draw);
+	for (std::unique_ptr<Tilemap> &draw : maps)
+		;/*if (draw != nullptr)
+		 game->_window.draw(*draw);*/	// TODO: flesh out tilemaps
+	_window.display();
+}
+
 void Game::load(sf::Sprite &sprite)
 {
 	sprites.push_back(std::make_unique<sf::Sprite>(sprite));
